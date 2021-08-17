@@ -1,0 +1,4 @@
+package discord
+
+class AppInfo {
+}

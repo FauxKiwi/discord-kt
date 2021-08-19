@@ -1,5 +1,7 @@
 package discord
 
+import kotlinx.serialization.json.Json
+
 data class VersionInfo(
     val major: Int,
     val minor: Int,
@@ -26,3 +28,8 @@ val versionInfo = VersionInfo(0, 0, 1, VersionInfo.ReleaseLevel.ALPHA, 0)
 val version = versionInfo.toString()
 
 const val API_BASE_URL = "https://discord.com/api"
+
+internal val json = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+}

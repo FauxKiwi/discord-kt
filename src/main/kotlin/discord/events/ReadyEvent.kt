@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Ready(
+class ReadyEvent(
     @SerialName("v")
     val gatewayVersion: Int,
     val user: User,

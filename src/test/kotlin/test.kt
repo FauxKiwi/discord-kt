@@ -1,12 +1,13 @@
 import discord.Client
 import discord.DiscordApplication
 import discord.Event
-import discord.events.MessageCreate
-import discord.events.Ready
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import discord.Guild
+import discord.events.MessageCreateEvent
+import discord.events.ReadyEvent
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 suspend fun main(): Unit = coroutineScope {
     App(Client(coroutineScope = this))
@@ -18,15 +19,16 @@ class App(client: Client) : DiscordApplication(client) {
     }
 
     @Event
-    suspend fun onReady(ctx: Ready) {
+    suspend fun onReady(event: ReadyEvent) {
         println("Ready")
+        delay(1000)
+        client.guilds.forEach { println(it.name) }
     }
 
     @Event
-    suspend fun onMessageCreate(ctx: MessageCreate) {
-        println(ctx.message.content)
+    suspend fun onMessageCreate(event: MessageCreateEvent) {
+        println(event.message.content)
         println("Current latency: ${client.latency}")
-        client.close()
     }
 }
 

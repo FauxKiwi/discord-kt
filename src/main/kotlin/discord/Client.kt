@@ -4,11 +4,10 @@ import base.DateTime
 import base.Or
 import discord.abc.AbstractChannel
 import discord.abc.GuildChannel
-import discord.abc.Snowflake
 import discord.abc.PrivateChannel
 import discord.events.EventContext
-import discord.events.MessageCreate
-import discord.events.Ready
+import discord.events.MessageCreateEvent
+import discord.events.ReadyEvent
 import discord.exceptions.*
 import io.ktor.client.*
 import io.ktor.client.engine.java.*
@@ -23,8 +22,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
-import java.lang.reflect.Method
 import java.nio.ByteBuffer
 import kotlin.jvm.Throws
 import kotlin.random.Random
@@ -51,9 +50,7 @@ class Client(
 ) {
     private val httpClient = HttpClient(Java) {
         install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-
-            })
+            serializer = KotlinxSerializer(json)
         }
         install(WebSockets)
     }
@@ -154,7 +151,7 @@ class Client(
         ) {
             println("Connected to the websocket")
 
-            val hello = Json.parseToJsonElement(String(incoming.receive().data)).jsonObject
+            val hello = json.parseToJsonElement(String(incoming.receive().data)).jsonObject
             val heartbeat = hello["d"]!!.jsonObject["heartbeat_interval"]!!.jsonPrimitive.long - 1000
 
             send(buildJsonObject {
@@ -170,12 +167,12 @@ class Client(
                 })
             }.toString())
 
-            val readyInc = Json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
+            val readyInc = json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
             assert(readyInc["op"]!!.jsonPrimitive.int == 0)
             assert(readyInc["t"]?.jsonPrimitive?.contentOrNull == "READY")
             sequenceId = readyInc["s"]!!.jsonPrimitive.int
 
-            val ready = Json {ignoreUnknownKeys = true}.decodeFromJsonElement<Ready>(readyInc["d"]!!.jsonObject)
+            val ready = json.decodeFromJsonElement<ReadyEvent>(readyInc["d"]!!.jsonObject)
             callEvent(ready)
 
             var receivedHeartbeatResponse = false
@@ -198,7 +195,7 @@ class Client(
             }
 
             while (!shouldClose) {
-                val inc = Json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
+                val inc = json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
                 when (inc["op"]!!.jsonPrimitive.int) {
                     11 -> {
                         println("HBR")
@@ -208,8 +205,11 @@ class Client(
                         sequenceId = inc["s"]!!.jsonPrimitive.int
                         val data = inc["d"]!!.jsonObject
                         when (inc["t"]!!.jsonPrimitive.content) {
-                            "GUILD_CREATE" -> {}
-                            "MESSAGE_CREATE" -> callEvent(MessageCreate(Json { ignoreUnknownKeys = true }.decodeFromJsonElement(data)))
+                            "GUILD_CREATE" -> {
+                                //println("Logged in to guild \"${data["name"]!!.jsonPrimitive.content}\"")
+                                _guilds.add(json.decodeFromJsonElement(data))
+                            }
+                            "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement(data)))
                         }
                     }
                 }
@@ -328,7 +328,7 @@ class Client(
     val applications = mutableListOf<DiscordApplication>()
 
     suspend fun callEvent(ctx: EventContext) = applications.forEach {
-        it.eventHandlers[ctx::class.starProjectedType]?.forEach { m -> m.callSuspend(it, ctx) }
+        it.eventHandlers[ctx::class.starProjectedType]?.forEach { m -> coroutineScope.launch { m.callSuspend(it, ctx) } }
     }
 
     private suspend inline fun <reified T> fetch(url: String) = httpClient.get<T>(API_BASE_URL+url) {

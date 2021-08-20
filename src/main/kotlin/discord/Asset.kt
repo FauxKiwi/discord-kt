@@ -1,0 +1,5 @@
+package discord
+
+class Asset {
+
+}

@@ -1,10 +1,13 @@
 package discord
 
+import discord.abc.Snowflake
 import kotlinx.serialization.Serializable
+import util.SnowflakeId
 
 @Serializable
 data class Role(
-    val id: String,
+    @SnowflakeId
+    override val id: Long,
     val name: String,
     val permissions: Int,
     val position: Int,
@@ -14,7 +17,7 @@ data class Role(
     val mentionable: Boolean,
     val tags: Tags? = null,
     val permissions_new: String
-) {
+) : Snowflake, PermissionOverwrite.Target {
     @Serializable
     data class Tags(
         val bot_id: String

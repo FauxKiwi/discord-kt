@@ -8,6 +8,7 @@ version = '1.0-SNAPSHOT'
 
 ext {
     ktor_version = '1.6.2'
+    logback_version = '1.2.5'
 }
 
 repositories {
@@ -19,6 +20,9 @@ dependencies {
     implementation "io.ktor:ktor-client-java:$ktor_version"
     implementation "io.ktor:ktor-client-serialization:$ktor_version"
     implementation "io.ktor:ktor-client-websockets:$ktor_version"
+
+    implementation "ch.qos.logback:logback-core:$logback_version"
+    implementation "ch.qos.logback:logback-classic:$logback_version"
 
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.10"
 

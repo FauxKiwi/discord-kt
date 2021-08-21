@@ -12,7 +12,7 @@ class IdSerializer : KSerializer<Long> {
 
     override fun serialize(encoder: Encoder, value: Long) = encoder.encodeString(value.toString())
 
-    override fun deserialize(decoder: Decoder): Long {println("h"); return decoder.decodeString().toLong()}
+    override fun deserialize(decoder: Decoder): Long = decoder.decodeString().toLong()
 }
 
 @Serializable(with = IdSerializer::class)

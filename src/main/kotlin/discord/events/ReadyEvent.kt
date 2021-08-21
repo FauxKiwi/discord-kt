@@ -3,6 +3,7 @@ package discord.events
 import discord.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import util.SnowflakeId
 
 @Serializable
 class ReadyEvent(
@@ -24,5 +25,6 @@ class UnavailableGuild(
 
 @Serializable
 class Application(
-
+    @SnowflakeId
+    val id: Long
 )

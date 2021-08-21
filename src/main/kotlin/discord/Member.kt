@@ -8,6 +8,6 @@ class Member(
     val user: User,
     @SerialName("premium_since")
     val premiumSince: String?,
-    val nick: String?
+    val nick: String? = null
 ) : PermissionOverwrite.Target {
 }

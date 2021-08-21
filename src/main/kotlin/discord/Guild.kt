@@ -10,10 +10,19 @@ import discord.exceptions.ClientException
 import discord.exceptions.Forbidden
 import discord.exceptions.HTTPException
 import discord.exceptions.InvalidData
+import discord.interactions.commands.Command
+import discord.interactions.commands.json
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.network.sockets.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import util.SnowflakeId
 import java.util.*
 import kotlin.NoSuchElementException
@@ -183,6 +192,9 @@ class Guild(
     val stage_instances: List<StageInstance>? = null,
     val stickers: List<Sticker>
 ) : Snowflake {
+    @Transient
+    internal lateinit var client: Client
+
     /**
      * The channel that denotes the AFK channel. `null` if it doesn’t exist.
      */
@@ -935,6 +947,18 @@ class Guild(
 
     override fun toString() = name
 
+    internal suspend fun registerSlashCommand(command: Command, scope: CoroutineScope) = scope.async {
+        println("Guild $name is registering command ${command.name}")
+        client.httpClient.post<HttpResponse>("https://discord.com/api/v8/applications/${client.applicationId}/guilds/$id/commands") {
+            this.header("Content-Type", "application/json")
+            header("Authorization", client.authValue)
+            this.body = command.json
+        }.also { commands[json.parseToJsonElement(it.receive()).jsonObject["id"]!!.jsonPrimitive.content.toLong()] = command }
+    }
+
+    @Transient
+    internal val commands = hashMapOf<Long, Command>()
+
     /**
      * A special feature that the guild has.
      */
@@ -1124,10 +1148,10 @@ class Channel(
     @SnowflakeId
     val id: Long
 ) {
-    val isVoice: Boolean = false
-    val isStage: Boolean = false
-    val isText: Boolean = false
-    val isCategory: Boolean = false
+    @Transient val isVoice: Boolean = false
+    @Transient val isStage: Boolean = false
+    @Transient val isText: Boolean = false
+    @Transient val isCategory: Boolean = false
     val position: Int = 0
 }
 

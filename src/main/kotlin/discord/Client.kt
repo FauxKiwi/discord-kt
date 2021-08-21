@@ -9,6 +9,9 @@ import discord.events.EventContext
 import discord.events.MessageCreateEvent
 import discord.events.ReadyEvent
 import discord.exceptions.*
+import discord.interactions.Interaction
+import discord.interactions.commands.Command
+import discord.interactions.commands.CommandContext
 import io.ktor.client.*
 import io.ktor.client.engine.java.*
 import io.ktor.client.features.json.*
@@ -22,14 +25,32 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 import java.nio.ByteBuffer
-import kotlin.jvm.Throws
 import kotlin.random.Random
 import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.starProjectedType
 
+/**
+ * Represents a client connection that connects to Discord. This class is used to interact with the Discord WebSocket and API.
+ * @param maxMessages The maximum number of messages to store in the internal message cache. This defaults to `1000`. Passing in `-1` disables the message cache.
+ * @param coroutineScope
+ * @param proxy
+ * @param proxyAuth
+ * @param shardId
+ * @param shardCount
+ * @param intents
+ * @param memberCacheFlags
+ * @param fetchOfflineMembers
+ * @param chunkGuildsAtStartup
+ * @param status
+ * @param activity
+ * @param allowedMentions
+ * @param heartbeatTimeout
+ * @param guildReadyTimeout
+ * @param guildSubscriptions
+ */
 class Client(
     maxMessages: Int = 1000,
     val coroutineScope: CoroutineScope = GlobalScope,
@@ -48,7 +69,7 @@ class Client(
     guildReadyTimeout: Float = 2f,
     guildSubscriptions: Boolean = true,
 ) {
-    private val httpClient = HttpClient(Java) {
+    internal val httpClient = HttpClient(Java) {
         install(JsonFeature) {
             serializer = KotlinxSerializer(json)
         }
@@ -61,13 +82,34 @@ class Client(
 
     private lateinit var token: String
     private var bot = true
-    private lateinit var authValue: String
+    internal lateinit var authValue: String //TODO: private
 
     private lateinit var gatewayUrl: Url
     private var shards = 0
     private var _ws: Unit? = null
     val ws get() = _ws
 
+    private val heartbeatTimeout = (heartbeatTimeout * 1000).toLong()
+    private val guildReadyTimeout = (guildReadyTimeout * 1000).toLong()
+
+    private var _applicationId: Long = 0
+    val applicationId get() = _applicationId //TODO
+
+    /**
+     * Retrieves a sequence that enables receiving your guilds.
+     *
+     * Note:
+     * Using this, you will only receive `Guild.owner`, `Guild.icon`, `Guild.id`, and `Guild.name` per Guild.
+     *
+     * Note:
+     * This method is an API call. For general usage, consider `guilds` instead.
+     * @param limit The number of guilds to retrieve. If `-1`, it retrieves every guild you have access to. Note, however, that this would make it a slow operation. Defaults to `100`.
+     * @param before Retrieves guilds before this date.
+     * @param after Retrieve guilds after this date or object.
+     * @return The guild with the guild data parsed.
+     * @throws HTTPException Getting the guilds failed
+     */
+    @Throws(HTTPException::class)
     suspend fun fetchGuilds(
         limit: Int = 100,
         before: DateTime? = null,
@@ -154,6 +196,7 @@ class Client(
             val hello = json.parseToJsonElement(String(incoming.receive().data)).jsonObject
             val heartbeat = hello["d"]!!.jsonObject["heartbeat_interval"]!!.jsonPrimitive.long - 1000
 
+            val beforeIdTime = System.currentTimeMillis()
             send(buildJsonObject {
                 put("op", 2)
                 put("d", buildJsonObject {
@@ -167,15 +210,25 @@ class Client(
                 })
             }.toString())
 
-            val readyInc = json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
+            val readyIncStr = String(incoming.receive().readBytes())
+            _latency = (System.currentTimeMillis() - beforeIdTime) / 1000f
+            val readyInc = json.parseToJsonElement(readyIncStr).jsonObject
             assert(readyInc["op"]!!.jsonPrimitive.int == 0)
             assert(readyInc["t"]?.jsonPrimitive?.contentOrNull == "READY")
             sequenceId = readyInc["s"]!!.jsonPrimitive.int
 
             val ready = json.decodeFromJsonElement<ReadyEvent>(readyInc["d"]!!.jsonObject)
-            callEvent(ready)
+            launch {
+                delay(guildReadyTimeout)
+                _applicationId = ready.application.id
+                println("registering commands")
+                guilds.forEach { guild ->
+                    applications.forEach { it.guildCommands[guild.id]?.forEach { (_, m) -> guild.registerSlashCommand(m.findAnnotation()!!, this)} }
+                }
+                callEvent(ready)
+            }
 
-            var receivedHeartbeatResponse = false
+            var receivedHeartbeatResponse: Boolean
 
             launch {
                 delay((heartbeat * Random(heartbeat).nextDouble()).toLong())
@@ -207,9 +260,11 @@ class Client(
                         when (inc["t"]!!.jsonPrimitive.content) {
                             "GUILD_CREATE" -> {
                                 //println("Logged in to guild \"${data["name"]!!.jsonPrimitive.content}\"")
-                                _guilds.add(json.decodeFromJsonElement(data))
+                                _guilds.add(json.decodeFromJsonElement<Guild>(data).apply { client = this@Client })
                             }
-                            "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement(data)))
+                            "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement<Message>(data).apply { client = this@Client }))
+                            "INTERACTION_CREATE" -> interaction(json.decodeFromJsonElement<Interaction>(data).apply { client = this@Client })
+                            else -> println("Unhandled event: ${inc["t"]}")
                         }
                     }
                 }
@@ -329,6 +384,14 @@ class Client(
 
     suspend fun callEvent(ctx: EventContext) = applications.forEach {
         it.eventHandlers[ctx::class.starProjectedType]?.forEach { m -> coroutineScope.launch { m.callSuspend(it, ctx) } }
+    }
+
+    private suspend fun interaction(interaction: Interaction) {
+        if (applications.isEmpty()) return
+        val context = interaction.context() ?: return
+        applications.forEach { a ->
+            a.guildCommands[interaction.guildId]!!.forEach { (n, m) -> if (n == interaction.data!!.name)m.callSuspend(a, context) }
+        }
     }
 
     private suspend inline fun <reified T> fetch(url: String) = httpClient.get<T>(API_BASE_URL+url) {

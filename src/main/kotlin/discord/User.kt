@@ -18,7 +18,7 @@ class User(
     val tfaEnabled: Boolean = false,
     val locale: String? = null,
     val verified: Boolean = false,
-    val email: String?,
+    val email: String? = null,
     val flags: Int = 0,
     @SerialName("premium_type")
     val nitroSubscription: Int = 0,

@@ -1,13 +1,18 @@
+import base.Color
 import discord.Client
 import discord.DiscordApplication
+import discord.Embed
 import discord.Event
-import discord.Guild
 import discord.events.MessageCreateEvent
 import discord.events.ReadyEvent
+import discord.interactions.commands.Command
+import discord.interactions.commands.CommandContext
+import discord.interactions.commands.CommandResponse
+import discord.interactions.commands.json
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 suspend fun main(): Unit = coroutineScope {
     App(Client(coroutineScope = this))
@@ -21,85 +26,32 @@ class App(client: Client) : DiscordApplication(client) {
     @Event
     suspend fun onReady(event: ReadyEvent) {
         println("Ready")
-        delay(1000)
+        /*client.httpClient.post<HttpResponse>("https://discord.com/api/v8/applications/${client.applicationId}/guilds/581185346465824768/commands") {
+            this.header("Content-Type", "application/json")
+            header("Authorization", client.authValue)
+            this.body = Command.Json("test", "tests")
+        }.also { println(it.receive<String>()) }*/
+        println(event.application.id)
         client.guilds.forEach { println(it.name) }
     }
 
     @Event
     suspend fun onMessageCreate(event: MessageCreateEvent) {
-        println(event.message.content)
-        println("Current latency: ${client.latency}")
+        if (event.message.content == "Hi")
+        event.message.respond("Hi, ${event.message.author.username}")
+    }
+
+    @Command("ping", "Gets the ping", guildIds = [581185346465824768])
+    suspend fun ping(ctx: CommandContext): CommandResponse {
+        return ctx.send("Pong! ${client.latency * 100}ms", hidden = true)
+    }
+
+    @Command("mc-user", "Get the name and head of a minecraft user.", guildIds = [581185346465824768], options = [
+        Command.Option(Command.Option.Type.String, "name", "The username")
+    ])
+    suspend fun getMcUser(ctx: CommandContext): CommandResponse {
+        return ctx.send(embeds = listOf(Embed(color = Color(0xffff0000),
+            author = Embed.Author(name = ctx["name"], iconUrl = "https://mc-heads.net/avatar/${ctx.get<String>("name")}")))
+        )
     }
 }
-
-/*suspend fun main() {
-    val client = HttpClient(Java) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
-        }
-        install(WebSockets)
-    }
-
-    client.wss(
-        method = HttpMethod.Get,
-        host = "gateway.discord.gg",
-        path = "/?v9=&encoding=json"
-    ) {
-        val hello = Json.parseToJsonElement(String(incoming.receive().data)).jsonObject
-        println(hello.toString())
-        val heartbeat = hello["d"]!!.jsonObject["heartbeat_interval"]!!.jsonPrimitive.long - 1000
-        println(heartbeat)
-
-        send(buildJsonObject {
-            put("op", 2)
-            put("d", buildJsonObject {
-                put("token", "ODQ4OTk3MDkxMDQ3ODk5MTY2.YLUwKA.rPNtZ3bsJwpfBmPwAVxDfaokSlE")
-                put("intents", 513)
-                put("properties", buildJsonObject {
-                    put("\$os", "windows")
-                    put("\$browser", "disco")
-                    put("\$device", "disco")
-                })
-            })
-        }.toString())
-
-        println(String(incoming.receive().readBytes()))
-
-        launch {
-            delay((heartbeat * Random(heartbeat).nextDouble()).toLong())
-            while (true) {
-                send(buildJsonObject {
-                    put("op", 1)
-                    put("d", null as Number?)
-                }.toString())
-                println(String(incoming.receive().readBytes()))
-                delay(heartbeat)
-            }
-        }
-
-        while (true) {
-            val inc = String(incoming.receive().readBytes())
-            println(inc)
-        }
-    }
-}*/
-
-/*suspend fun main() {
-    val client = HttpClient(CIO) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
-        }
-    }
-
-    /*val response: HttpResponse = client.get("https://discord.com/api/guilds/846756269078872065") {
-        header("Authorization", "Bot ODQ4OTk3MDkxMDQ3ODk5MTY2.YLUwKA.rPNtZ3bsJwpfBmPwAVxDfaokSlE")
-    }
-
-    println(response.readText())*/
-
-    val response: Guild = client.get("https://discord.com/api/guilds/846756269078872065") {
-        header("Authorization", "Bot ODQ4OTk3MDkxMDQ3ODk5MTY2.YLUwKA.rPNtZ3bsJwpfBmPwAVxDfaokSlE")
-    }
-
-    println(response.ownerId)
-}*/

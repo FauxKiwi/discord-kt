@@ -1,17 +1,15 @@
 package discord
 
 import base.DateTime
-import base.Or
 import discord.abc.AbstractChannel
 import discord.abc.GuildChannel
 import discord.abc.PrivateChannel
+import discord.events.Event
 import discord.events.EventContext
 import discord.events.MessageCreateEvent
 import discord.events.ReadyEvent
 import discord.exceptions.*
 import discord.interactions.Interaction
-import discord.interactions.commands.Command
-import discord.interactions.commands.CommandContext
 import io.ktor.client.*
 import io.ktor.client.engine.java.*
 import io.ktor.client.features.json.*
@@ -218,8 +216,10 @@ class Client(
             sequenceId = readyInc["s"]!!.jsonPrimitive.int
 
             val ready = json.decodeFromJsonElement<ReadyEvent>(readyInc["d"]!!.jsonObject)
+            var readyTime = System.currentTimeMillis() + guildReadyTimeout
             launch {
-                delay(guildReadyTimeout)
+                while (System.currentTimeMillis() <= readyTime)
+                    delay(guildReadyTimeout)
                 _applicationId = ready.application.id
                 println("registering commands")
                 guilds.forEach { guild ->
@@ -260,6 +260,7 @@ class Client(
                         when (inc["t"]!!.jsonPrimitive.content) {
                             "GUILD_CREATE" -> {
                                 //println("Logged in to guild \"${data["name"]!!.jsonPrimitive.content}\"")
+                                readyTime += guildReadyTimeout
                                 _guilds.add(json.decodeFromJsonElement<Guild>(data).apply { client = this@Client })
                             }
                             "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement<Message>(data).apply { client = this@Client }))
@@ -342,7 +343,11 @@ class Client(
         TODO()
     }
 
-    suspend fun fetchTemplate(@Or("template") code: String? = null, @Or("code") template: Template? = null): Template {
+    suspend fun fetchTemplate(code: String): Template {
+        TODO()
+    }
+
+    suspend fun fetchTemplate(template: Template): Template {
         TODO()
     }
 
@@ -357,7 +362,11 @@ class Client(
         TODO()
     }
 
-    suspend fun fetchInvite(@Or("invite") url: String? = null, @Or("url") invite: Invite? = null, withCounts: Boolean = true): Invite {
+    suspend fun fetchInvite(url: String, withCounts: Boolean = true): Invite {
+        TODO()
+    }
+
+    suspend fun fetchInvite(invite: Invite, withCounts: Boolean = true): Invite {
         TODO()
     }
 

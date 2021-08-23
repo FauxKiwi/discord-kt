@@ -1,4 +1,4 @@
-package discord
+package discord.events
 
 @Target(AnnotationTarget.FUNCTION)
 @Suppress("unused")

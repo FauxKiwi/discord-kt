@@ -1,6 +1,6 @@
 package discord
 
-import discord.events.EventContext
+import discord.events.Event
 import discord.events.EventContextType
 import discord.interactions.commands.Command
 import discord.interactions.commands.CommandContextType
@@ -11,7 +11,6 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.valueParameters
-import kotlin.reflect.jvm.jvmErasure
 
 open class DiscordApplication(val client: Client) {
     internal val eventHandlers = hashMapOf<KType, MutableList<KCallable<*>>>()

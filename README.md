@@ -1,5 +1,6 @@
 # discord-kt
 [![](https://jitpack.io/v/FauxKiwi/discord-kt.svg)](https://jitpack.io/#FauxKiwi/discord-kt)
+[![](https://img.shields.io/website?label=docs&up_message=available&url=https%3A%2F%2Ffauxkiwi.github.io%2Fdiscord-kt)](https://fauxkiwi.github.io/discord-kt)
 
 Discord bot library for kotlin inspired by discord.py
 
@@ -48,5 +49,3 @@ suspend fun ping(ctx: CommandContext): CommandResponse {
 }
 //...
 ```
-## Docs
-[To the docs](https://fauxkiwi.github.io/discord-kt)

@@ -4,10 +4,7 @@ import discord.util.DateTime
 import discord.abc.AbstractChannel
 import discord.abc.GuildChannel
 import discord.abc.PrivateChannel
-import discord.events.Event
-import discord.events.EventContext
-import discord.events.MessageCreateEvent
-import discord.events.ReadyEvent
+import discord.events.*
 import discord.exceptions.*
 import discord.interactions.Interaction
 import io.ktor.client.*
@@ -89,6 +86,8 @@ class Client(
 
     private val heartbeatTimeout = (heartbeatTimeout * 1000).toLong()
     private val guildReadyTimeout = (guildReadyTimeout * 1000).toLong()
+    private var _ready = false
+    val ready get() = _ready
 
     private var _applicationId: Long = 0
     val applicationId get() = _applicationId //TODO
@@ -225,6 +224,7 @@ class Client(
                 guilds.forEach { guild ->
                     applications.forEach { it.guildCommands[guild.id]?.forEach { (_, m) -> guild.registerSlashCommand(m.findAnnotation()!!, this)} }
                 }
+                _ready = true
                 callEvent(ready)
             }
 
@@ -259,9 +259,12 @@ class Client(
                         val data = inc["d"]!!.jsonObject
                         when (inc["t"]!!.jsonPrimitive.content) {
                             "GUILD_CREATE" -> {
-                                //println("Logged in to guild \"${data["name"]!!.jsonPrimitive.content}\"")
-                                readyTime += guildReadyTimeout
-                                _guilds.add(json.decodeFromJsonElement<Guild>(data).apply { client = this@Client })
+                                val guild = json.decodeFromJsonElement<Guild>(data).apply { client = this@Client }
+                                _guilds.add(guild)
+                                if (!this@Client.ready)
+                                    readyTime += guildReadyTimeout
+                                else
+                                    callEvent(JoinGuildEvent(guild))
                             }
                             "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement<Message>(data).apply { client = this@Client }))
                             "INTERACTION_CREATE" -> interaction(json.decodeFromJsonElement<Interaction>(data).apply { client = this@Client })

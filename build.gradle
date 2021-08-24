@@ -14,7 +14,9 @@ ext {
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral() {
+        allowInsecureProtocol = true
+    }
 }
 
 dependencies {

@@ -18,7 +18,7 @@ value class Color(val rgba: UInt) {
     constructor(red: UInt, green: UInt, blue: UInt, alpha: UInt) :
             this(red or (green shl 8) or (blue shl 16) or (alpha shl 24))
 
-    class Serializer : KSerializer<Color> {
+    internal class Serializer : KSerializer<Color> {
         override val descriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.LONG)
 
         override fun serialize(encoder: Encoder, value: Color) = encoder.encodeLong(value.rgba.toLong())

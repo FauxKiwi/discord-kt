@@ -17,7 +17,7 @@ data class Role(
     val mentionable: Boolean,
     val tags: Tags? = null,
     val permissions_new: String
-) : Snowflake, PermissionOverwrite.Target {
+) : Snowflake(), PermissionOverwrite.Target {
     @Serializable
     data class Tags(
         val bot_id: String

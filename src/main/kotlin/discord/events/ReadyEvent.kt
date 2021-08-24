@@ -12,7 +12,7 @@ class ReadyEvent(
     val user: User,
     val guilds: List<UnavailableGuild>,
     @SerialName("session_id")
-    val sessionId: String,
+    internal val sessionId: String,
     val shard: IntArray? = null,
     val application: Application
 ) : EventContext() {

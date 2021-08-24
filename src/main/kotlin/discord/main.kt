@@ -32,4 +32,6 @@ const val API_BASE_URL = "https://discord.com/api"
 internal val json = Json {
     ignoreUnknownKeys = true
     coerceInputValues = true
+    encodeDefaults = false
+    this.useAlternativeNames = false
 }

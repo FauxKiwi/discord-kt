@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 class Member(
     val user: User,
     @SerialName("premium_since")
-    val premiumSince: String?,
+    val premiumSince: String? = null,
     val nick: String? = null
 ) : PermissionOverwrite.Target {
 }

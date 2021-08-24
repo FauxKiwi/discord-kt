@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import discord.util.SnowflakeId
 
 @Serializable
-class User(
+class User internal constructor(
     @SnowflakeId
     override val id: Long,
     val username: String,
@@ -24,5 +24,6 @@ class User(
     val nitroSubscription: Int = 0,
     @SerialName("public_flags")
     val publicFlags: Int = 0,
-) : Snowflake {
+) : Snowflake() {
+    override fun toString(): String = "$username#$discriminator"
 }

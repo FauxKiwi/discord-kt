@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 import kotlin.random.Random
 import kotlin.reflect.full.callSuspend
@@ -57,9 +58,9 @@ class Client(
     memberCacheFlags: MemberCacheFlags = MemberCacheFlags.fromIntents(intents),
     fetchOfflineMembers: Boolean = false,
     chunkGuildsAtStartup: Boolean = intents.members,
-    status: Status = Status(),
-    val activity: Activity? = Activity(),
-    val allowedMentions: AllowedMentions? = AllowedMentions(),
+    var status: Status = Status.Online,
+    var activities: List<Activity> = emptyList(),
+    val allowedMentions: AllowedMentions? = null,
     heartbeatTimeout: Float = 60f,
     guildReadyTimeout: Float = 2f,
     guildSubscriptions: Boolean = true,
@@ -81,7 +82,7 @@ class Client(
 
     private lateinit var gatewayUrl: Url
     private var shards = 0
-    private var _ws: Unit? = null
+    private var _ws: DefaultWebSocketSession? = null
     val ws get() = _ws
 
     private val heartbeatTimeout = (heartbeatTimeout * 1000).toLong()
@@ -89,8 +90,8 @@ class Client(
     private var _ready = false
     val ready get() = _ready
 
-    private var _applicationId: Long = 0
-    val applicationId get() = _applicationId //TODO
+    private lateinit var _application: Application
+    val applicationId get() = _application.id
 
     /**
      * Retrieves a sequence that enables receiving your guilds.
@@ -121,8 +122,10 @@ class Client(
     private var rateLimited = false
     val isWsRateLimited: Boolean get() = rateLimited
 
-    private var _user: ClientUser? = null
+    private lateinit var _user: User
     val user get() = _user
+
+    private lateinit var sessionId: String
 
     private val _guilds = mutableListOf<Guild>()
     val guilds: List<Guild> get() = _guilds
@@ -140,9 +143,11 @@ class Client(
 
     val isReady: Boolean get() = TODO()
 
-    private var errorHandler: suspend (Error) -> Unit = { System.err.println("Error: "); it.printStackTrace() }
-    fun onError(eventMethod: suspend (error: Error) -> Unit) {
-        errorHandler = eventMethod
+    private var afk = -1L
+
+    //private var exceptionHandler: suspend (Exception) -> Unit = { System.err.println("Error: "); it.printStackTrace() }
+    fun onError(eventMethod: (exception: Throwable) -> Unit) {
+        Thread.setDefaultUncaughtExceptionHandler { _, e -> eventMethod(e) }
     }
 
     @Deprecated("", replaceWith = ReplaceWith("Guild.chunk()"))
@@ -188,24 +193,22 @@ class Client(
             host = gatewayUrl.host,
             path = "/?v9=&encoding=json"
         ) {
-            println("Connected to the websocket")
+            logger.debug("Connected to the websocket")
+            _ws = this
 
             val hello = json.parseToJsonElement(String(incoming.receive().data)).jsonObject
             val heartbeat = hello["d"]!!.jsonObject["heartbeat_interval"]!!.jsonPrimitive.long - 1000
 
             val beforeIdTime = System.currentTimeMillis()
-            send(buildJsonObject {
-                put("op", 2)
-                put("d", buildJsonObject {
-                    put("token", token)
-                    put("intents", 513 /*TODO*/)
-                    put("properties", buildJsonObject {
-                        put("\$os", System.getProperty("os"))
-                        put("\$browser", "discord-kt")
-                        put("\$device", "discord-kt")
-                    })
+            send(2, buildJsonObject {
+                put("token", token)
+                put("intents", 513 /*TODO*/)
+                put("properties", buildJsonObject {
+                    put("\$os", System.getProperty("os"))
+                    put("\$browser", "discord-kt")
+                    put("\$device", "discord-kt")
                 })
-            }.toString())
+            })
 
             val readyIncStr = String(incoming.receive().readBytes())
             _latency = (System.currentTimeMillis() - beforeIdTime) / 1000f
@@ -217,14 +220,16 @@ class Client(
             val ready = json.decodeFromJsonElement<ReadyEvent>(readyInc["d"]!!.jsonObject)
             var readyTime = System.currentTimeMillis() + guildReadyTimeout
             launch {
+                changePresence(activities, status, false)
                 while (System.currentTimeMillis() <= readyTime)
                     delay(guildReadyTimeout)
-                _applicationId = ready.application.id
-                println("registering commands")
+                _application = ready.application
                 guilds.forEach { guild ->
                     applications.forEach { it.guildCommands[guild.id]?.forEach { (_, m) -> guild.registerSlashCommand(m.findAnnotation()!!, this)} }
                 }
                 _ready = true
+                _user = ready.user
+                sessionId = ready.sessionId
                 callEvent(ready)
             }
 
@@ -233,15 +238,10 @@ class Client(
             launch {
                 delay((heartbeat * Random(heartbeat).nextDouble()).toLong())
                 while (true) {
-                    send(buildJsonObject {
-                        put("op", 1)
-                        put("d", sequenceId.takeIf { it >= 0 })
-                    }.toString())
+                    sendHeartbeat()
                     val timestamp = System.currentTimeMillis()
-                    println("Send HB")
                     receivedHeartbeatResponse = false
                     while (!receivedHeartbeatResponse) delay(100)
-                    println("Received HBR")
                     _latency = (System.currentTimeMillis() - timestamp) / 1000f
                     delay(heartbeat)
                 }
@@ -250,10 +250,8 @@ class Client(
             while (!shouldClose) {
                 val inc = json.parseToJsonElement(String(incoming.receive().readBytes())).jsonObject
                 when (inc["op"]!!.jsonPrimitive.int) {
-                    11 -> {
-                        println("HBR")
-                        receivedHeartbeatResponse = true
-                    }
+                    11 -> receivedHeartbeatResponse = true
+                    1 -> sendHeartbeat()
                     0 -> {
                         sequenceId = inc["s"]!!.jsonPrimitive.int
                         val data = inc["d"]!!.jsonObject
@@ -268,14 +266,36 @@ class Client(
                             }
                             "MESSAGE_CREATE" -> callEvent(MessageCreateEvent(json.decodeFromJsonElement<Message>(data).apply { client = this@Client }))
                             "INTERACTION_CREATE" -> interaction(json.decodeFromJsonElement<Interaction>(data).apply { client = this@Client })
-                            else -> println("Unhandled event: ${inc["t"]}")
+                            else -> logger.warn("Unhandled event: ${inc["t"]}")
                         }
                     }
                 }
             }
 
+            launch {
+                val closeReason = closeReason.await()
+                if (closeReason == null) {
+                    //reconnect
+                    logger.info("Reconnecting...")
+                    send(6, buildJsonObject {
+                        put("token", token)
+                        put("session_id", ready.sessionId)
+                        put("seq", sequenceId)
+                    })
+                } else {
+                    shouldClose = true
+                    logger.warn("Connection was closed by Discord: ${closeReason.message} (${closeReason.knownReason?.let { "Reason: $it" } ?: "Code: ${closeReason.code}"}")
+                }
+            }
+
+            _ws = null
+            logger.debug("Closing connection")
             close(CloseReason(1000, "Bot closed connection"))
         }
+    }
+
+    private suspend fun DefaultWebSocketSession.sendHeartbeat() {
+        send(1, JsonPrimitive(sequenceId.takeIf { it >= 0 }))
     }
 
     suspend fun close() {
@@ -291,13 +311,11 @@ class Client(
         connect(reconnect)
     }
 
-    fun run(token: String, bot: Boolean = true, reconnect: Boolean = true) {
+    fun run(token: String, bot: Boolean = true, reconnect: Boolean = true) = coroutineScope.launch {
         try {
-            coroutineScope.launch { start(token, bot, reconnect) }
-        } catch (_: KeyboardInterrupt) {
-            coroutineScope.launch { close() }
+            start(token, bot, reconnect)
         } finally {
-            //coroutineScope.close()
+            close()
         }
     }
 
@@ -342,8 +360,17 @@ class Client(
         TODO()
     }
 
-    suspend fun changePresence(activity: Activity? = null, status: Status? = null, afk: Boolean = false) {
-        TODO()
+    suspend fun changePresence(activities: List<Activity>? = null, status: Status? = null, afk: Boolean = false) {
+        if (activities == null && status == null && this.afk == -1L == afk) return
+        status?.let { this.status = it }
+        activities?.let { this.activities = it }
+        val a = activities?.onEach { it.createdAt = System.currentTimeMillis() } ?: this.activities
+        (ws ?: return).send(3, buildJsonObject {
+            put("since", System.currentTimeMillis()) /*if (this@Client.afk == -1L && afk) System.currentTimeMillis() else if (!afk) null else this@Client.afk*/
+            put("status", json.encodeToJsonElement(this@Client.status))
+            put("activities", json.encodeToJsonElement(a))
+            put("afk", afk)
+        })
     }
 
     suspend fun fetchTemplate(code: String): Template {
@@ -392,6 +419,11 @@ class Client(
 
     suspend fun fetchWebhook(webhookId: Long): Webhook = fetch("/webhooks/$webhookId")
 
+    suspend fun DefaultWebSocketSession.send(op: Int, data: JsonElement?) = send(buildJsonObject {
+        put("op", op)
+        data?.let { put("d", it) }
+    }.toString())
+
     val applications = mutableListOf<DiscordApplication>()
 
     suspend fun callEvent(ctx: EventContext) = applications.forEach {
@@ -433,4 +465,6 @@ class Client(
     class GatewayResponse(
         val url: String
     )
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 }

@@ -62,30 +62,30 @@ annotation class Command(
             }
         }
     }
+}
+
+@Serializable
+internal class CommandJson(
+    val name: String,
+    val description: String,
+    val options: List<Option>
+) {
+    constructor(command: Command) :
+            this(command.name, command.description, command.options.map { option -> Option(
+                option.name, option.description, option.type.ordinal + 1, option.required
+            ) })
 
     @Serializable
-    class Json(
+    class Option(
         val name: String,
         val description: String,
-        val options: List<Option>
-    ) {
-        constructor(command: Command) :
-                this(command.name, command.description, command.options.map { option -> Option(
-                    option.name, option.description, option.type.ordinal + 1, option.required
-                ) })
-
-        @Serializable
-        class Option(
-            val name: String,
-            val description: String,
-            val type: Int,
-            val required: Boolean,
-            //TODO
-        )
-    }
+        val type: Int,
+        val required: Boolean,
+        //TODO
+    )
 }
 
 fun valueOfChoice(choice: Command.Option.Choice) = if (choice.stringValue != "\u0000" && choice.intValue == Int.MIN_VALUE) choice.intValue else
     if (choice.stringValue == "\u0000" && choice.intValue != Int.MIN_VALUE) false else error("No valid choice value")
 
-val Command.json get() = Command.Json(this)
+internal val Command.json get() = CommandJson(this)

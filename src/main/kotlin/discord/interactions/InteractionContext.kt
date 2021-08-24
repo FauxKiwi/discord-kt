@@ -38,11 +38,11 @@ abstract class InteractionContext(
     protected abstract suspend fun invokeDefer(hidden: Boolean)
 
     abstract suspend fun send(
-        content: String = "",
+        content: String? = null,
         embeds: List<Embed> = emptyList(),
         tts: Boolean = false,
         files: List<File> = emptyList(),
-        allowedMentions: AllowedMentions = AllowedMentions(),
+        allowedMentions: AllowedMentions? = null,
         hidden: Boolean = false,
         components: List<Component> = emptyList()
     ): CommandResponse

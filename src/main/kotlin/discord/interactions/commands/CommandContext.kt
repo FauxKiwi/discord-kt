@@ -32,11 +32,11 @@ class CommandContext(
     suspend fun invoke(): Nothing = TODO()
 
     override suspend fun send(
-        content: String,
+        content: String?,
         embeds: List<Embed>,
         tts: Boolean,
         files: List<File>,
-        allowedMentions: AllowedMentions,
+        allowedMentions: AllowedMentions?,
         hidden: Boolean,
         components: List<Component>
     ): CommandResponse {
@@ -46,8 +46,14 @@ class CommandContext(
             this.body = buildJsonObject {
                 put("type", 4)
                 put("data", buildJsonObject {
-                    put("content", content)
+                    if (tts) put("tts", tts)
+                    if (content != null) put("content", content)
                     if (embeds.isNotEmpty()) put("embeds", json.encodeToJsonElement(embeds))
+                    if (allowedMentions != null) put("allowed_mentions", json.encodeToJsonElement(allowedMentions))
+                    var flags = 0u
+                    if (hidden) flags /* |= */ = flags or (1u shl 6)
+                    if (flags != 0u) put("flags", flags.toLong())
+                    if (components.isNotEmpty()) put("components", json.encodeToJsonElement(components))
                 })
             }
         }

@@ -191,7 +191,7 @@ class Guild(
     val nsfw_level: Int,
     val stage_instances: List<StageInstance>? = null,
     val stickers: List<Sticker>
-) : Snowflake {
+) : Snowflake() {
     @Transient
     internal lateinit var client: Client
 
@@ -936,19 +936,10 @@ class Guild(
         TODO()
     }
 
-
-    override fun equals(other: Any?): Boolean {
-        if (other === this) return true
-        if (other !is Guild) return false
-        return other.id == id
-    }
-
-    override fun hashCode(): Int = id.hashCode()
-
     override fun toString() = name
 
     internal suspend fun registerSlashCommand(command: Command, scope: CoroutineScope) = scope.async {
-        println("Guild $name is registering command ${command.name}")
+        //println("Guild $name is registering command ${command.name}")
         client.httpClient.post<HttpResponse>("https://discord.com/api/v8/applications/${client.applicationId}/guilds/$id/commands") {
             this.header("Content-Type", "application/json")
             header("Authorization", client.authValue)

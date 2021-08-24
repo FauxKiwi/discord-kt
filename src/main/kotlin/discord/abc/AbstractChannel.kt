@@ -1,4 +1,4 @@
 package discord.abc
 
-abstract class AbstractChannel : Snowflake {
+abstract class AbstractChannel : Snowflake() {
 }

@@ -1,2 +1,4 @@
+before-install:
+  - chmod +x gradlew
 install:
   - ./gradlew clean build publishToMavenLocal

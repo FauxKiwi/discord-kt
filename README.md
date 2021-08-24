@@ -48,3 +48,5 @@ suspend fun ping(ctx: CommandContext): CommandResponse {
 }
 //...
 ```
+## Docs
+[To the docs](https://fauxkiwi.github.io/discord-kt)

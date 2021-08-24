@@ -1,6 +1,8 @@
 plugins {
+    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.5.10'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.10'
+    id 'java'
 }
 
 group = 'me.fauxkiwi'
@@ -36,3 +38,17 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = '16'
 }
+
+/*publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                groupId = group
+                artifactId = project.name
+                version = project.properties["version"] as? String?
+
+                from(components["java"])
+            }
+        }
+    }
+}*/

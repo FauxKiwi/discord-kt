@@ -1,4 +1,4 @@
-package base
+package discord.util
 
 sealed interface Optional<out T> {
     @JvmInline

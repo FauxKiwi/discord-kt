@@ -2,7 +2,7 @@ package discord
 
 import discord.abc.Snowflake
 import kotlinx.serialization.Serializable
-import util.SnowflakeId
+import discord.util.SnowflakeId
 
 @Serializable
 data class Role(

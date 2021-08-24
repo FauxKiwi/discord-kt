@@ -1,6 +1,6 @@
 package discord.abc
 
-import base.DateTime
+import discord.util.DateTime
 
 interface Snowflake {
     val id: Long

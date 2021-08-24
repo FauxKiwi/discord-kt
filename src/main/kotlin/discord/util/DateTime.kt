@@ -1,4 +1,4 @@
-package base
+package discord.util
 
 import discord.abc.Snowflake
 

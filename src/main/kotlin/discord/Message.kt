@@ -4,7 +4,7 @@ import io.ktor.client.request.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import util.SnowflakeId
+import discord.util.SnowflakeId
 
 @Serializable
 class Message(

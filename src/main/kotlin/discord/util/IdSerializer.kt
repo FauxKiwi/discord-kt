@@ -1,4 +1,4 @@
-package util
+package discord.util
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

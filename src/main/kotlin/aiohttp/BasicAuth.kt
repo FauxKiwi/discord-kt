@@ -1,4 +1,0 @@
-package aiohttp
-
-class BasicAuth {
-}

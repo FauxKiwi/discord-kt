@@ -1,6 +1,6 @@
 package discord
 
-import base.DateTime
+import discord.util.DateTime
 import discord.abc.AbstractChannel
 import discord.abc.GuildChannel
 import discord.abc.PrivateChannel
@@ -53,7 +53,7 @@ class Client(
     maxMessages: Int = 1000,
     val coroutineScope: CoroutineScope = GlobalScope,
     proxy: String? = null,
-    proxyAuth: aiohttp.BasicAuth? = null,
+    //proxyAuth: BasicAuth? = null,
     shardId: Int? = null,
     shardCount: Int = 0,
     val intents: Intents = Intents.default,

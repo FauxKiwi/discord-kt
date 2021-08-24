@@ -1,6 +1,6 @@
 package discord
 
-import base.Color
+import discord.util.Color
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

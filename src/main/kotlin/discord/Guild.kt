@@ -1,9 +1,9 @@
 package discord
 
-import base.Color
-import base.DateTime
-import base.Optional
-import base.none
+import discord.util.Color
+import discord.util.DateTime
+import discord.util.Optional
+import discord.util.none
 import discord.abc.GuildChannel
 import discord.abc.Snowflake
 import discord.exceptions.ClientException
@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import util.SnowflakeId
+import discord.util.SnowflakeId
 import java.util.*
 import kotlin.NoSuchElementException
 

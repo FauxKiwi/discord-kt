@@ -3,7 +3,7 @@ package discord.events
 import discord.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import util.SnowflakeId
+import discord.util.SnowflakeId
 
 @Serializable
 class ReadyEvent(

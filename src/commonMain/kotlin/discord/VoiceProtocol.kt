@@ -1,0 +1,3 @@
+package discord
+
+class VoiceProtocol

@@ -1,5 +1,0 @@
-package discord
-
-class Permissions {
-
-}

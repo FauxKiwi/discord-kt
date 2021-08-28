@@ -1,4 +1,0 @@
-package discord
-
-class VoiceProtocol {
-}

@@ -696,8 +696,10 @@ $dokka.location:discord/PresenceUpdate/PresenceUpdate/#/PointingToDeclaration/d
 $dokka.location:discord/Profile///PointingToDeclaration/discord-kt/discord/-profile/index.html
 $dokka.location:discord/Profile/Profile/#/PointingToDeclaration/discord-kt/discord/-profile/-profile.html
 $dokka.location:discord/Role.Tags///PointingToDeclaration/discord-kt/discord/-role/-tags/index.html
-$dokka.location:discord/Role.Tags/Tags/#kotlin.String/PointingToDeclaration/discord-kt/discord/-role/-tags/-tags.html
-$dokka.location:discord/Role.Tags/bot_id/#/PointingToDeclaration/discord-kt/discord/-role/-tags/bot_id.html
+$dokka.location:discord/Role.Tags/Tags/#kotlin.Long?#kotlin.Long?#kotlin.Nothing?/PointingToDeclaration/discord-kt/discord/-role/-tags/-tags.html
+$dokka.location:discord/Role.Tags/botId/#/PointingToDeclaration/discord-kt/discord/-role/-tags/bot-id.html
+$dokka.location:discord/Role.Tags/integrationId/#/PointingToDeclaration/discord-kt/discord/-role/-tags/integration-id.html
+$dokka.location:discord/Role.Tags/premiumSubscriberRole/#/PointingToDeclaration/discord-kt/discord/-role/-tags/premium-subscriber-role.html
 $dokka.location:discord/Role///PointingToDeclaration/discord-kt/discord/-role/index.html
 $dokka.location:discord/Role/Role/#kotlin.Long#kotlin.String#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Boolean#kotlin.Boolean#kotlin.Boolean#discord.Role.Tags?#kotlin.String/PointingToDeclaration/discord-kt/discord/-role/-role.html
 $dokka.location:discord/Role/color/#/PointingToDeclaration/discord-kt/discord/-role/color.html

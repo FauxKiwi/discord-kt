@@ -988,6 +988,12 @@ class Guild(
         MoreEmoji,
 
         /**
+         * Guild has increased custom sticker slots.
+         */
+        @SerialName("MORE_STICKERS")
+        MoreStickers,
+        
+        /**
          * Guild shows up in Server Discovery.
          */
         @SerialName("DISCOVERABLE")
@@ -1059,16 +1065,31 @@ class Guild(
         @SerialName("PREVIEW_ENABLED")
         PreviewEnabled,
 
+        /**
+         * Guild has enabled ticketed events.
+         */
+        @SerialName("TICKETED_EVENTS_ENABLED")
+        TicketedEventsEnabled,
+        
+        /**
+         * Guild has enabled monetization.
+         */
+        @SerialName("MONETIZATION_ENABLED")
+        MonetizationEnabled,
+        
+        /**
+         * Guild has access to create private threads.
+         */
         @SerialName("PRIVATE_THREADS")
         PrivateThreads,
-        @SerialName("THREADS_ENABLED_TESTING")
-        ThreadsEnabledTesting,
         @SerialName("THREADS_ENABLED")
         ThreadsEnabled,
         @SerialName("SEVEN_DAY_THREAD_ARCHIVE")
         SevenDayThreadArchive,
         @SerialName("THREE_DAY_THREAD_ARCHIVE")
         ThreeDayThreadArchive
+        @SerialName("NEW_THREAD_PERMISSIONS")
+        NewThreadPermissions
     }
 
     /**

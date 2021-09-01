@@ -1,4 +1,4 @@
 #before-install:
 #  - chmod +x gradlew
 install:
-  - bash ./gradlew clean build publishToMavenLocal
+  - bash ./gradlew jitpackBuild

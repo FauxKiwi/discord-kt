@@ -143,3 +143,16 @@ publishing {
         }
     }
 }
+
+tasks.register("jitpackBuild") {
+    dependsOn(
+        // clean
+        "cleanJvmTest",
+        // java
+        "jar",
+        // kotlin jvm
+        "jvmJar",
+        // maven
+        "publishToMavenLocal"
+    )
+}

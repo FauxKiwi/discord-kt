@@ -20,6 +20,13 @@ data class Role(
 ) : Snowflake(), PermissionOverwrite.Target {
     @Serializable
     data class Tags(
-        val bot_id: String
+        @SerialName("bot_id")
+        @SnowflakeId
+        val botId: Long? = null,
+        @SerialName("integration_id")
+        @SnowflakeId
+        val integrationId: Long? = null,
+        @SerialName("premium_subscriber")
+        val premiumSubscriberRole: Nothing? = null
     )
 }

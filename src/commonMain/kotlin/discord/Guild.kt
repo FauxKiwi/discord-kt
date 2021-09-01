@@ -1087,7 +1087,7 @@ class Guild(
         @SerialName("SEVEN_DAY_THREAD_ARCHIVE")
         SevenDayThreadArchive,
         @SerialName("THREE_DAY_THREAD_ARCHIVE")
-        ThreeDayThreadArchive
+        ThreeDayThreadArchive,
         @SerialName("NEW_THREAD_PERMISSIONS")
         NewThreadPermissions
     }

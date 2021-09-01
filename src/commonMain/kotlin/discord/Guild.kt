@@ -1084,6 +1084,8 @@ class Guild(
         PrivateThreads,
         @SerialName("THREADS_ENABLED")
         ThreadsEnabled,
+        @SerialName("THREADS_ENABLED_TESTING")
+        ThreadsEnabledTesting,
         @SerialName("SEVEN_DAY_THREAD_ARCHIVE")
         SevenDayThreadArchive,
         @SerialName("THREE_DAY_THREAD_ARCHIVE")

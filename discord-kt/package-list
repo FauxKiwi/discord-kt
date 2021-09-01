@@ -465,6 +465,9 @@ $dokka.location:discord/Guild.Feature.MoreEmoji/ordinal/#/PointingToDeclaration/
 $dokka.location:discord/Guild.Feature.MoreStickers///PointingToDeclaration/discord-kt/discord/-guild/-feature/-more-stickers/index.html
 $dokka.location:discord/Guild.Feature.MoreStickers/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-more-stickers/name.html
 $dokka.location:discord/Guild.Feature.MoreStickers/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-more-stickers/ordinal.html
+$dokka.location:discord/Guild.Feature.NewThreadPermissions///PointingToDeclaration/discord-kt/discord/-guild/-feature/-new-thread-permissions/index.html
+$dokka.location:discord/Guild.Feature.NewThreadPermissions/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-new-thread-permissions/name.html
+$dokka.location:discord/Guild.Feature.NewThreadPermissions/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-new-thread-permissions/ordinal.html
 $dokka.location:discord/Guild.Feature.News///PointingToDeclaration/discord-kt/discord/-guild/-feature/-news/index.html
 $dokka.location:discord/Guild.Feature.News/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-news/name.html
 $dokka.location:discord/Guild.Feature.News/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-news/ordinal.html

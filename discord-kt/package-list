@@ -492,6 +492,9 @@ $dokka.location:discord/Guild.Feature.SevenDayThreadArchive/ordinal/#/PointingTo
 $dokka.location:discord/Guild.Feature.ThreadsEnabled///PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled/index.html
 $dokka.location:discord/Guild.Feature.ThreadsEnabled/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled/name.html
 $dokka.location:discord/Guild.Feature.ThreadsEnabled/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled/ordinal.html
+$dokka.location:discord/Guild.Feature.ThreadsEnabledTesting///PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled-testing/index.html
+$dokka.location:discord/Guild.Feature.ThreadsEnabledTesting/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled-testing/name.html
+$dokka.location:discord/Guild.Feature.ThreadsEnabledTesting/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-threads-enabled-testing/ordinal.html
 $dokka.location:discord/Guild.Feature.ThreeDayThreadArchive///PointingToDeclaration/discord-kt/discord/-guild/-feature/-three-day-thread-archive/index.html
 $dokka.location:discord/Guild.Feature.ThreeDayThreadArchive/name/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-three-day-thread-archive/name.html
 $dokka.location:discord/Guild.Feature.ThreeDayThreadArchive/ordinal/#/PointingToDeclaration/discord-kt/discord/-guild/-feature/-three-day-thread-archive/ordinal.html

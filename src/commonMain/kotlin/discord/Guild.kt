@@ -15,6 +15,7 @@ import io.ktor.client.statement.*
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -217,7 +218,7 @@ class Guild(
      * @throws HTTPException Getting the members failed.
      */
     @Throws(ClientException::class, HTTPException::class)
-    suspend fun fetchMembers(limit: Int = 1000, after: DateTime? = null): Sequence<Member> {
+    suspend fun fetchMembers(limit: Int = 1000, after: Instant? = null): Sequence<Member> {
         TODO()
     }
 
@@ -236,7 +237,7 @@ class Guild(
      * @throws HTTPException An error occurred while fetching the audit logs.
      */
     @Throws(Forbidden::class, HTTPException::class)
-    suspend fun auditLogs(limit: Int = 100, before: DateTime? = null, after: DateTime? = null, oldestFirst: Boolean = after != null, user: Snowflake, action: AuditLogAction): Sequence<AuditLogEntry> {
+    suspend fun auditLogs(limit: Int = 100, before: Instant? = null, after: Instant? = null, oldestFirst: Boolean = after != null, user: Snowflake, action: AuditLogAction): Sequence<AuditLogEntry> {
         TODO()
     }
 

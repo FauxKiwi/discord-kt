@@ -1,11 +1,11 @@
 package discord.abc
 
-import discord.util.DateTime
+import kotlinx.datetime.Instant
 
 abstract class Snowflake {
     abstract val id: Long
 
-    fun createdAt(): DateTime = DateTime(id)
+    fun createdAt() = Instant.fromEpochMilliseconds(0) //TODO
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true

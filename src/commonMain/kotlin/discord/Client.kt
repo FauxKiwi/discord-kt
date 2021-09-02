@@ -8,7 +8,6 @@ import discord.exceptions.*
 import discord.interactions.Interaction
 import discord.interactions.ReceivedInteraction
 import discord.interactions.commands.ApplicationCommand
-import discord.util.DateTime
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
@@ -20,16 +19,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 /**
  * Represents a client connection that connects to Discord. This class is used to interact with the Discord WebSocket and API.
  * @param maxMessages The maximum number of messages to store in the internal message cache. This defaults to `1000`. Passing in `-1` disables the message cache.
  * @param coroutineScope
  * @param proxy
- * @param proxyAuth
  * @param shardId
  * @param shardCount
  * @param intents
@@ -37,13 +39,14 @@ import kotlin.random.Random
  * @param fetchOfflineMembers
  * @param chunkGuildsAtStartup
  * @param status
- * @param activity
+ * @param activities
  * @param allowedMentions
  * @param heartbeatTimeout
  * @param guildReadyTimeout
  * @param guildSubscriptions
  */
-class Client(
+@OptIn(ExperimentalTime::class)
+class Client constructor(
     maxMessages: Int = 1000,
     val coroutineScope: CoroutineScope = GlobalScope,
     proxy: String? = null,
@@ -57,8 +60,8 @@ class Client(
     var status: Status = Status.Online,
     var activities: List<Activity> = emptyList(),
     val allowedMentions: AllowedMentions? = null,
-    heartbeatTimeout: Float = 60f,
-    guildReadyTimeout: Float = 2f,
+    private val heartbeatTimeout: Duration = Duration.seconds(60),
+    private val guildReadyTimeout: Duration = Duration.seconds(2),
     guildSubscriptions: Boolean = true,
 ) {
     internal val httpClient = HttpClient {
@@ -81,8 +84,8 @@ class Client(
     private var _ws: DefaultWebSocketSession? = null
     val ws get() = _ws
 
-    private val heartbeatTimeout = (heartbeatTimeout * 1000).toLong()
-    private val guildReadyTimeout = (guildReadyTimeout * 1000).toLong()
+    //private val heartbeatTimeout = (heartbeatTimeout * 1000).toLong()
+    //private val guildReadyTimeout = (guildReadyTimeout * 1000).toLong()
     private var _ready = false
     val ready get() = _ready
 
@@ -110,14 +113,14 @@ class Client(
     @Throws(HTTPException::class)
     suspend fun fetchGuilds(
         limit: Int = 100,
-        before: DateTime? = null,
-        after: DateTime? = null
+        before: Instant? = null,
+        after: Instant? = null
     ): Sequence<Guild> {
         TODO()
     }
 
-    private var _latency = 0f
-    val latency: Float get() = _latency
+    private var _latency: Duration = Duration.INFINITE
+    val latency: Duration get() = _latency
 
     private var rateLimited = false
     val isWsRateLimited: Boolean get() = rateLimited
@@ -186,6 +189,7 @@ class Client(
         close()
     }
 
+    @OptIn(ExperimentalTime::class)
     @Throws(GatewayNotFound::class, ConnectionClosed::class)
     suspend fun connect(reconnect: Boolean = true) {
         httpClient.wss(
@@ -199,7 +203,7 @@ class Client(
             val hello = json.parseToJsonElement(io.ktor.utils.io.core.String(incoming.receive().data)).jsonObject
             val heartbeat = hello["d"]!!.jsonObject["heartbeat_interval"]!!.jsonPrimitive.long - 1000
 
-            val beforeIdTime = DateTime.now().millis
+            val beforeIdTime = Clock.System.now()
             send(2, buildJsonObject {
                 put("token", token)
                 put("intents", 513 /*TODO*/)
@@ -211,22 +215,25 @@ class Client(
             })
 
             val readyIncStr = io.ktor.utils.io.core.String(incoming.receive().readBytes())
-            _latency = (DateTime.now().millis - beforeIdTime) / 1000f
+            _latency = Clock.System.now() - beforeIdTime
             val readyInc = json.parseToJsonElement(readyIncStr).jsonObject
             require(readyInc["op"]!!.jsonPrimitive.int == 0)
             require(readyInc["t"]?.jsonPrimitive?.contentOrNull == "READY")
             sequenceId = readyInc["s"]!!.jsonPrimitive.int
 
             val ready = json.decodeFromJsonElement<ReadyEvent>(readyInc["d"]!!.jsonObject)
-            var readyTime = DateTime.now().millis + guildReadyTimeout
+            var readyTime = Clock.System.now() + guildReadyTimeout
             launch {
                 changePresence(activities, status, false)
-                while (DateTime.now().millis <= readyTime)
+                while (Clock.System.now() <= readyTime)
                     delay(guildReadyTimeout)
                 _application = ready.application
                 /*guilds.forEach { guild ->
                     applications.forEach { it.guildCommands[guild.id]?.forEach { (_, m) -> guild.registerSlashCommand(m.findAnnotation(), this)} }
                 }*/ //TODO
+                guilds.forEach { guild ->
+                    guildApplicationCommands[guild.id]?.forEach { (_, c) -> guild.registerSlashCommand(c, this) }
+                }
                 _ready = true
                 _user = ready.user
                 sessionId = ready.sessionId
@@ -239,10 +246,10 @@ class Client(
                 delay((heartbeat * Random(heartbeat).nextDouble()).toLong())
                 while (true) {
                     sendHeartbeat()
-                    val timestamp = DateTime.now().millis
+                    val timestamp = Clock.System.now()
                     receivedHeartbeatResponse = false
-                    while (!receivedHeartbeatResponse) delay(100)
-                    _latency = (DateTime.now().millis - timestamp) / 1000f
+                    while (!receivedHeartbeatResponse && Clock.System.now() - timestamp < heartbeatTimeout) delay(100)
+                    _latency = Clock.System.now() - timestamp
                     delay(heartbeat)
                 }
             }
@@ -379,9 +386,9 @@ class Client(
         if (activities == null && status == null && this.afk == -1L == afk) return
         status?.let { this.status = it }
         activities?.let { this.activities = it }
-        val a = activities?.onEach { it.createdAt = DateTime.now().millis } ?: this.activities
+        val a = activities?.onEach { it.createdAt = Clock.System.now() } ?: this.activities
         (ws ?: return).send(3, buildJsonObject {
-            put("since", DateTime.now().millis) /*if (this@Client.afk == -1L && afk) System.currentTimeMillis() else if (!afk) null else this@Client.afk*/
+            put("since", Clock.System.now().epochSeconds)
             put("status", json.encodeToJsonElement(this@Client.status))
             put("activities", json.encodeToJsonElement(a))
             put("afk", afk)

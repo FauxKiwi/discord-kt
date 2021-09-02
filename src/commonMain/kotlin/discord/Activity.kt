@@ -2,6 +2,7 @@ package discord
 
 import discord.util.EnumToIntSerializer
 import discord.util.SnowflakeId
+import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 //import org.intellij.lang.annotations.Pattern
@@ -33,7 +34,7 @@ class Activity(
     val flags: UInt? = null,
     val buttons: Array<Button>? = null
 ) {
-    internal var createdAt: Long = -1
+    internal var createdAt = Clock.System.now()
 
     @Serializable(with = Type.Serializer::class)
     enum class Type {

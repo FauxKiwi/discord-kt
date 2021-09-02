@@ -3,6 +3,7 @@ package discord
 import discord.abc.Snowflake
 import kotlinx.serialization.Serializable
 import discord.util.SnowflakeId
+import kotlinx.serialization.SerialName
 
 @Serializable
 data class Role(
@@ -27,6 +28,6 @@ data class Role(
         @SnowflakeId
         val integrationId: Long? = null,
         @SerialName("premium_subscriber")
-        val premiumSubscriberRole: Nothing? = null
+        val premiumSubscriberRole: Boolean? = null
     )
 }

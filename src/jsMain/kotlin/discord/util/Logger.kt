@@ -1,6 +1,8 @@
 package discord.util
 
-import kotlin.js.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.reflect.KClass
 
 //actual inline fun <reified A : Annotation> KCallable<*>.findAnnotation(): A?
@@ -33,26 +35,27 @@ private class LoggerImpl(val name: String) : Logger {
     override fun isErrorEnabled() = error
 
     override fun trace(message: String) {
-        if (isTraceEnabled()) log("TRACE", message)
+        if (isTraceEnabled()) log("30;1", "TRACE", message)
     }
 
     override fun debug(message: String) {
-        if (isDebugEnabled()) log("DEBUG", message)
+        if (isDebugEnabled()) log("36", "DEBUG", message)
     }
 
     override fun info(message: String) {
-        if (isInfoEnabled()) log("INFO", message)
+        if (isInfoEnabled()) log("32", "INFO", message)
     }
 
     override fun warn(message: String) {
-        if (isWarnEnabled()) log("WARN", message)
+        if (isWarnEnabled()) log("33", "WARN", message)
     }
 
     override fun error(message: String) {
-        if (isErrorEnabled()) log("ERROR", message)
+        if (isErrorEnabled()) log("31", "ERROR", message)
     }
 
-    private fun log(level: String, message: String) = println("${DateTime.now().format("HH:mm:ss.SSS")} - $level $name - $message")
+    private fun log(color: String, level: String, message: String) =
+        println("\u001b[${color}m${Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())} - $level $name - $message\u001B[0m")
 }
 
 private const val trace = false

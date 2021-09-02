@@ -1,4 +1,3 @@
 package discord.interactions
 
-open class Interaction {
-}
+open class Interaction

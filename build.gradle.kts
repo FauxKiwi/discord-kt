@@ -20,9 +20,9 @@ kotlin {
     js {
         nodejs()
     }
-    mingwX64()
+    /*mingwX64()
     linuxX64()
-    macosX64()
+    macosX64()*/
 
     sourceSets {
         val ktorVersion = "1.6.2"

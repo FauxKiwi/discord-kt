@@ -160,20 +160,6 @@ $dokka.location:discord.util/Color/blue/#/PointingToDeclaration/discord-kt/disc
 $dokka.location:discord.util/Color/green/#/PointingToDeclaration/discord-kt/discord.util/-color/green.html
 $dokka.location:discord.util/Color/red/#/PointingToDeclaration/discord-kt/discord.util/-color/red.html
 $dokka.location:discord.util/Color/rgba/#/PointingToDeclaration/discord-kt/discord.util/-color/rgba.html
-$dokka.location:discord.util/DateTime.Companion///PointingToDeclaration/discord-kt/discord.util/-date-time/-companion/index.html
-$dokka.location:discord.util/DateTime.Companion/now/#/PointingToDeclaration/discord-kt/discord.util/-date-time/-companion/now.html
-$dokka.location:discord.util/DateTime///PointingToDeclaration/discord-kt/discord.util/-date-time/index.html
-$dokka.location:discord.util/DateTime/DateTime/#kotlin.Long/PointingToDeclaration/discord-kt/discord.util/-date-time/-date-time.html
-$dokka.location:discord.util/DateTime/day/#/PointingToDeclaration/discord-kt/discord.util/-date-time/day.html
-$dokka.location:discord.util/DateTime/format/#kotlin.String/PointingToDeclaration/discord-kt/discord.util/-date-time/format.html
-$dokka.location:discord.util/DateTime/hour/#/PointingToDeclaration/discord-kt/discord.util/-date-time/hour.html
-$dokka.location:discord.util/DateTime/millis/#/PointingToDeclaration/discord-kt/discord.util/-date-time/[]millis.html
-$dokka.location:discord.util/DateTime/millisecond/#/PointingToDeclaration/discord-kt/discord.util/-date-time/millisecond.html
-$dokka.location:discord.util/DateTime/minute/#/PointingToDeclaration/discord-kt/discord.util/-date-time/minute.html
-$dokka.location:discord.util/DateTime/month/#/PointingToDeclaration/discord-kt/discord.util/-date-time/month.html
-$dokka.location:discord.util/DateTime/second/#/PointingToDeclaration/discord-kt/discord.util/-date-time/second.html
-$dokka.location:discord.util/DateTime/toString/#/PointingToDeclaration/discord-kt/discord.util/-date-time/to-string.html
-$dokka.location:discord.util/DateTime/year/#/PointingToDeclaration/discord-kt/discord.util/-date-time/year.html
 $dokka.location:discord.util/File///PointingToDeclaration/discord-kt/discord.util/-file/index.html
 $dokka.location:discord.util/File/File/#/PointingToDeclaration/discord-kt/discord.util/-file/-file.html
 $dokka.location:discord.util/IdSerializer///PointingToDeclaration/discord-kt/discord.util/-id-serializer/index.html
@@ -325,7 +311,7 @@ $dokka.location:discord/Client.GatewayResponse///PointingToDeclaration/discord-
 $dokka.location:discord/Client.GatewayResponse/GatewayResponse/#kotlin.String/PointingToDeclaration/discord-kt/discord/-client/-gateway-response/-gateway-response.html
 $dokka.location:discord/Client.GatewayResponse/url/#/PointingToDeclaration/discord-kt/discord/-client/-gateway-response/url.html
 $dokka.location:discord/Client///PointingToDeclaration/discord-kt/discord/-client/index.html
-$dokka.location:discord/Client/Client/#kotlin.Int#kotlinx.coroutines.CoroutineScope#kotlin.String?#kotlin.Int?#kotlin.Int#discord.Intents#discord.MemberCacheFlags#kotlin.Boolean#kotlin.Boolean#discord.Status#kotlin.collections.List[discord.Activity]#discord.AllowedMentions?#kotlin.Float#kotlin.Float#kotlin.Boolean/PointingToDeclaration/discord-kt/discord/-client/-client.html
+$dokka.location:discord/Client/Client/#kotlin.Int#kotlinx.coroutines.CoroutineScope#kotlin.String?#kotlin.Int?#kotlin.Int#discord.Intents#discord.MemberCacheFlags#kotlin.Boolean#kotlin.Boolean#discord.Status#kotlin.collections.List[discord.Activity]#discord.AllowedMentions?#kotlin.time.Duration#kotlin.time.Duration#kotlin.Boolean/PointingToDeclaration/discord-kt/discord/-client/-client.html
 $dokka.location:discord/Client/activities/#/PointingToDeclaration/discord-kt/discord/-client/activities.html
 $dokka.location:discord/Client/allChannels/#/PointingToDeclaration/discord-kt/discord/-client/all-channels.html
 $dokka.location:discord/Client/allMembers/#/PointingToDeclaration/discord-kt/discord/-client/all-members.html
@@ -344,7 +330,7 @@ $dokka.location:discord/Client/emojis/#/PointingToDeclaration/discord-kt/discor
 $dokka.location:discord/Client/event/#kotlin.coroutines.SuspendFunction1[TypeParam(bounds=[discord.events.EventContext]),kotlin.Unit]/PointingToDeclaration/discord-kt/discord/-client/event.html
 $dokka.location:discord/Client/fetchChannel/#kotlin.Long/PointingToDeclaration/discord-kt/discord/-client/fetch-channel.html
 $dokka.location:discord/Client/fetchGuild/#kotlin.Long/PointingToDeclaration/discord-kt/discord/-client/fetch-guild.html
-$dokka.location:discord/Client/fetchGuilds/#kotlin.Int#discord.util.DateTime?#discord.util.DateTime?/PointingToDeclaration/discord-kt/discord/-client/fetch-guilds.html
+$dokka.location:discord/Client/fetchGuilds/#kotlin.Int#kotlinx.datetime.Instant?#kotlinx.datetime.Instant?/PointingToDeclaration/discord-kt/discord/-client/fetch-guilds.html
 $dokka.location:discord/Client/fetchInvite/#discord.Invite#kotlin.Boolean/PointingToDeclaration/discord-kt/discord/-client/fetch-invite.html
 $dokka.location:discord/Client/fetchInvite/#kotlin.String#kotlin.Boolean/PointingToDeclaration/discord-kt/discord/-client/fetch-invite.html
 $dokka.location:discord/Client/fetchTemplate/#discord.Template/PointingToDeclaration/discord-kt/discord/-client/fetch-template.html
@@ -542,7 +528,7 @@ $dokka.location:discord/Guild/afkChannel/#/PointingToDeclaration/discord-kt/dis
 $dokka.location:discord/Guild/afkTimeout/#/PointingToDeclaration/discord-kt/discord/-guild/afk-timeout.html
 $dokka.location:discord/Guild/approximate_member_count/#/PointingToDeclaration/discord-kt/discord/-guild/approximate_member_count.html
 $dokka.location:discord/Guild/approximate_presence_count/#/PointingToDeclaration/discord-kt/discord/-guild/approximate_presence_count.html
-$dokka.location:discord/Guild/auditLogs/#kotlin.Int#discord.util.DateTime?#discord.util.DateTime?#kotlin.Boolean#discord.abc.Snowflake#discord.AuditLogAction/PointingToDeclaration/discord-kt/discord/-guild/audit-logs.html
+$dokka.location:discord/Guild/auditLogs/#kotlin.Int#kotlinx.datetime.Instant?#kotlinx.datetime.Instant?#kotlin.Boolean#discord.abc.Snowflake#discord.AuditLogAction/PointingToDeclaration/discord-kt/discord/-guild/audit-logs.html
 $dokka.location:discord/Guild/ban/#discord.abc.Snowflake#kotlin.Int#kotlin.String?/PointingToDeclaration/discord-kt/discord/-guild/ban.html
 $dokka.location:discord/Guild/banner/#/PointingToDeclaration/discord-kt/discord/-guild/banner.html
 $dokka.location:discord/Guild/bannerAsset/#/PointingToDeclaration/discord-kt/discord/-guild/banner-asset.html
@@ -582,7 +568,7 @@ $dokka.location:discord/Guild/fetchChannels/#/PointingToDeclaration/discord-kt/
 $dokka.location:discord/Guild/fetchEmoji/#kotlin.Long/PointingToDeclaration/discord-kt/discord/-guild/fetch-emoji.html
 $dokka.location:discord/Guild/fetchEmojis/#/PointingToDeclaration/discord-kt/discord/-guild/fetch-emojis.html
 $dokka.location:discord/Guild/fetchMember/#kotlin.Long/PointingToDeclaration/discord-kt/discord/-guild/fetch-member.html
-$dokka.location:discord/Guild/fetchMembers/#kotlin.Int#discord.util.DateTime?/PointingToDeclaration/discord-kt/discord/-guild/fetch-members.html
+$dokka.location:discord/Guild/fetchMembers/#kotlin.Int#kotlinx.datetime.Instant?/PointingToDeclaration/discord-kt/discord/-guild/fetch-members.html
 $dokka.location:discord/Guild/fetchRoles/#/PointingToDeclaration/discord-kt/discord/-guild/fetch-roles.html
 $dokka.location:discord/Guild/fileSizeLimit/#/PointingToDeclaration/discord-kt/discord/-guild/file-size-limit.html
 $dokka.location:discord/Guild/getChannel/#kotlin.Long/PointingToDeclaration/discord-kt/discord/-guild/get-channel.html
@@ -696,7 +682,7 @@ $dokka.location:discord/PresenceUpdate/PresenceUpdate/#/PointingToDeclaration/d
 $dokka.location:discord/Profile///PointingToDeclaration/discord-kt/discord/-profile/index.html
 $dokka.location:discord/Profile/Profile/#/PointingToDeclaration/discord-kt/discord/-profile/-profile.html
 $dokka.location:discord/Role.Tags///PointingToDeclaration/discord-kt/discord/-role/-tags/index.html
-$dokka.location:discord/Role.Tags/Tags/#kotlin.Long?#kotlin.Long?#kotlin.Nothing?/PointingToDeclaration/discord-kt/discord/-role/-tags/-tags.html
+$dokka.location:discord/Role.Tags/Tags/#kotlin.Long?#kotlin.Long?#kotlin.Boolean?/PointingToDeclaration/discord-kt/discord/-role/-tags/-tags.html
 $dokka.location:discord/Role.Tags/botId/#/PointingToDeclaration/discord-kt/discord/-role/-tags/bot-id.html
 $dokka.location:discord/Role.Tags/integrationId/#/PointingToDeclaration/discord-kt/discord/-role/-tags/integration-id.html
 $dokka.location:discord/Role.Tags/premiumSubscriberRole/#/PointingToDeclaration/discord-kt/discord/-role/-tags/premium-subscriber-role.html
